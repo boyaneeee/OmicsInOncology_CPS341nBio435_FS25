@@ -155,8 +155,8 @@ renderGraph(example_graph_plot)
 Do you understand why the plot looks the way it looks?
 
 ``` {r}
-baits <- c("A", "A", "A", "A")
-preys <- c("B", "C", "D", "E")
+baits <- c("A", "A", "A", "A", "B", "B")
+preys <- c("B", "C", "D", "E", "F", "G")
 
 
 #First we use our function to create the graph
@@ -176,8 +176,8 @@ renderGraph(example_graph_plot)
 Do you understand why the plot looks the way it looks?
 
 ``` {r}
-baits <- c("A", "A", "A", "A")
-preys <- c("B", "C", "D", "E")
+baits <- c("A", "A", "A", "A", "I", "I")
+preys <- c("B", "C", "D", "E", "F", "G")
 
 
 #First we use our function to create the graph
@@ -211,14 +211,15 @@ For this you can use the print() or head() function. However also just typing th
 
 ```{r}
 ## lets load our supplementary data
-SuppS6 <- 
+SuppS6 <- read_excel("C:/Users/Admin/Downloads/science.abf3066_tables_s2_to_s12/science.abf3066_Table_S6.xlsx", sheet="Differential Interaction Score")
+
 
 ```
 
 ### 2. Check the loaded data
 
 ```{r}
-
+SuppS6
 ```
 
 Now we know what our function does, let's have a look at our experimental data.
@@ -231,19 +232,20 @@ For convenience we will first store the content of these columns in their own va
 ### 1. Store the content of the *Bait column* in a variable **baits** and the *Prey column* in **preys**
 
 ```{r}
-
+baits <- SuppS6$Bait
+preys <- SuppS6$Prey
 ```
 
 ### 2. use the *makeproteingraph(.. , ..)* function and store the output in the variable **interactionGraph** (this is now a *graphNEL-object*)
 
 ```{r}
-
+interactionGraph <- makeproteingraph(baits, preys, weight=1)
 ```
 
 3. "print" the content of the interactionGraph variable (don't use head or print, just type the variable name)
 
 ```{r}
-
+interactionGraph
 ```
 
 4. Look at our examples above and try to create a plot of our interactionGraph
@@ -253,6 +255,7 @@ We will make use of the neato layout **layoutType="neato"** (there are more layo
 
 ```{r}
 
+renderGraph(layoutGraph(interactionGraph, layoutType="neato"))
 ```
 
 
@@ -303,14 +306,21 @@ Of course we like to plot this as well, like we did with the complete dataset.
 *All the steps above are similar to the steps you did for the 'complete' dataset*
 
 ```{r}
-
+baits_sub <- SuppS6_sub$Bait
+preys_sub <- SuppS6_sub$Prey
+ppiGraph <- makeproteingraph(baits_sub, preys_sub, weight = 1)
 ```
 
 3. layout the ppiGraph using the layoutGraph(.., layoutType="neato") function
+
+```{r}
+layoutGraph(ppiGraph, layoutType="neato")
+```
+
 4. render the graph.
 
 ```{r}
-
+renderGraph(layoutGraph(ppiGraph, layoutType="neato"))
 ```
 
 ## Let's make the plot more informative
@@ -388,7 +398,9 @@ The number of connections per node can be found with the 'degree' function.
 Sort the output of this function to give a nice overview of what proteins have the most connected proteins.
 
 ```{r}
-
+node_degrees <- degree(ppiGraph)
+sorted_degrees <- sort(node_degrees, decreasing = TRUE)
+print(sorted_degrees)
 
 ```
 
@@ -398,8 +410,19 @@ In R, there is a function called 'table', that will give you the possibility to 
 Use this function to analyze the output of the degree function from above
 
 ```{r}
+library(graph)
+
+# Calculate the degree (number of connections) for each node
+node_counts <- degree(ppiGraph)
+
+# Use table to count frequencies of each degree value
+degree_frequencies <- table(node_counts)
+
+# Print the frequency table
+print(degree_frequencies)
 
 ```
+
 ```{r}
 hist(sort(degree(ppiGraph)))
 ```
@@ -421,6 +444,8 @@ Extract the connected components from our graph using the connectedComp method. 
 Assign the outcome to a variable with a name you will still understand when we wake you up at night (hypothetically of course!).
 
 ```{r}
+connected_components <- connectedComp(ppiGraph)
+print(connected_components)
 
 ```
 
